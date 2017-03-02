@@ -1,9 +1,11 @@
 package by.alexeypuplikov.controllers;
 
+import by.alexeypuplikov.exception.DuplicateTopicException;
 import by.alexeypuplikov.models.Voting;
 import by.alexeypuplikov.repositories.VoteRepository;
 import by.alexeypuplikov.repositories.VotingOptionRepository;
 import by.alexeypuplikov.repositories.VotingRepository;
+import by.alexeypuplikov.utils.ValidateVoting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +37,10 @@ public class VotingRestController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<?> addVoting(@RequestBody Voting voting) {
-        return new ResponseEntity<>(votingRepository.save(voting), HttpStatus.CREATED);
+        if (ValidateVoting.validateVoting(votingRepository, voting.getTopic())) {
+            return new ResponseEntity<>(votingRepository.save(voting), HttpStatus.CREATED);
+        } else {
+            throw new DuplicateTopicException(voting.getTopic());
+        }
     }
 }

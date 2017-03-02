@@ -4,4 +4,5 @@ import by.alexeypuplikov.models.Voting;
 import org.springframework.data.repository.CrudRepository;
 
 public interface VotingRepository extends CrudRepository<Voting, Long> {
+    Voting findByTopic(String topic);
 }
