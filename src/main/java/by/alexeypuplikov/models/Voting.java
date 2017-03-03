@@ -29,10 +29,14 @@ public class Voting {
     @OneToMany(mappedBy = "voting")
     private Set<Vote> votes;
 
+    @Column(name = "IS_LAUNCHED")
+    private boolean isLaunched;
+
     public Voting() {
     }
 
     public Voting(String topic, String link) {
+        this.isLaunched = false;
         this.topic = topic;
         this.link = link;
     }
@@ -57,6 +61,10 @@ public class Voting {
         return link;
     }
 
+    public boolean isLaunched() {
+        return isLaunched;
+    }
+
     public void setLink(String link) {
         this.link = link;
     }
@@ -77,6 +85,10 @@ public class Voting {
         this.votes = votes;
     }
 
+    public void setLaunched(boolean launched) {
+        isLaunched = launched;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -84,11 +96,7 @@ public class Voting {
 
         Voting voting = (Voting) o;
 
-        if (Id != voting.Id) return false;
-        if (!topic.equals(voting.topic)) return false;
-        if (!link.equals(voting.link)) return false;
-        if (!votingOptions.equals(voting.votingOptions)) return false;
-        return votes != null ? votes.equals(voting.votes) : voting.votes == null;
+        return Id == voting.Id && isLaunched == voting.isLaunched && topic.equals(voting.topic) && (link != null ? link.equals(voting.link) : voting.link == null && (votingOptions != null ? votingOptions.equals(voting.votingOptions) : voting.votingOptions == null && (votes != null ? votes.equals(voting.votes) : voting.votes == null)));
 
     }
 
@@ -96,9 +104,10 @@ public class Voting {
     public int hashCode() {
         int result = (int) (Id ^ (Id >>> 32));
         result = 31 * result + topic.hashCode();
-        result = 31 * result + link.hashCode();
-        result = 31 * result + votingOptions.hashCode();
+        result = 31 * result + (link != null ? link.hashCode() : 0);
+        result = 31 * result + (votingOptions != null ? votingOptions.hashCode() : 0);
         result = 31 * result + (votes != null ? votes.hashCode() : 0);
+        result = 31 * result + (isLaunched ? 1 : 0);
         return result;
     }
 
@@ -110,6 +119,7 @@ public class Voting {
                 ", link='" + link + '\'' +
                 ", votingOptions=" + votingOptions +
                 ", votes=" + votes +
+                ", isLaunched=" + isLaunched +
                 '}';
     }
 }

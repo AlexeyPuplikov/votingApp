@@ -1,6 +1,5 @@
 package by.alexeypuplikov.utils;
 
-import by.alexeypuplikov.exception.DuplicateTopicException;
 import by.alexeypuplikov.models.Voting;
 import by.alexeypuplikov.repositories.VotingRepository;
 
@@ -10,10 +9,14 @@ public class ValidateVoting {
 
     public static boolean validateVoting(VotingRepository votingRepository, String topic) {
         List<Voting> votingSet = (List<Voting>) votingRepository.findAll();
-        for (Voting voting : votingSet) {
-            if (topic.equals(voting.getTopic())) {
-                return false;
+        if (topic != null) {
+            for (Voting voting : votingSet) {
+                if (topic.equals(voting.getTopic())) {
+                    return false;
+                }
             }
+        } else {
+            return false;
         }
         return true;
     }
