@@ -8,9 +8,9 @@ import java.util.List;
 public class ValidateVoting {
 
     public static boolean validateVoting(VotingRepository votingRepository, String topic) {
-        List<Voting> votingSet = (List<Voting>) votingRepository.findAll();
+        List<Voting> votingList = (List<Voting>) votingRepository.findAll();
         if (topic != null) {
-            for (Voting voting : votingSet) {
+            for (Voting voting : votingList) {
                 if (topic.equals(voting.getTopic())) {
                     return false;
                 }

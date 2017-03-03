@@ -1,5 +1,7 @@
 package by.alexeypuplikov.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,9 +18,11 @@ public class Vote {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
+    @JsonIgnore
     @ManyToOne
     private VotingOption votingOption;
 
+    @JsonIgnore
     @ManyToOne
     private Voting voting;
 
@@ -61,9 +65,7 @@ public class Vote {
 
         Vote vote = (Vote) o;
 
-        if (id != vote.id) return false;
-        if (!votingOption.equals(vote.votingOption)) return false;
-        return voting.equals(vote.voting);
+        return id == vote.id && votingOption.equals(vote.votingOption) && voting.equals(vote.voting);
 
     }
 

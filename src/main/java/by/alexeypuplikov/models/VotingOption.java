@@ -1,5 +1,7 @@
 package by.alexeypuplikov.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,6 +23,7 @@ public class VotingOption {
     @Column(name = "OPTION_TEXT")
     private String optionText;
 
+    @JsonIgnore
     @ManyToOne()
     private Voting voting;
 
@@ -73,10 +76,7 @@ public class VotingOption {
 
         VotingOption that = (VotingOption) o;
 
-        if (id != that.id) return false;
-        if (!optionText.equals(that.optionText)) return false;
-        if (!voting.equals(that.voting)) return false;
-        return votes != null ? votes.equals(that.votes) : that.votes == null;
+        return id == that.id && optionText.equals(that.optionText) && voting.equals(that.voting) && (votes != null ? votes.equals(that.votes) : that.votes == null);
 
     }
 
