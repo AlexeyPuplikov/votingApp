@@ -88,4 +88,14 @@ public class VotingOption {
         result = 31 * result + (votes != null ? votes.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "VotingOption{" +
+                "id=" + id +
+                ", optionText='" + optionText + '\'' +
+                ", voting=" + voting +
+                ", votes=" + votes +
+                '}';
+    }
 }

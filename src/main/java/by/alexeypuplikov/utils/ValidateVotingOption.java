@@ -1,24 +1,18 @@
 package by.alexeypuplikov.utils;
 
+import by.alexeypuplikov.exception.VotingException;
 import by.alexeypuplikov.models.Voting;
 import by.alexeypuplikov.models.VotingOption;
 import by.alexeypuplikov.repositories.VotingOptionRepository;
 
-import java.util.List;
-
 public class ValidateVotingOption {
-
-    public static boolean validateVotingOption(VotingOptionRepository votingOptionRepository, String optionText, Voting voting) {
-        List<VotingOption> votingOptions = votingOptionRepository.findByVoting(voting);
-        if (optionText != null) {
-            for (VotingOption votingOption : votingOptions) {
-                if (optionText.equals(votingOption.getOptionText())) {
-                    return false;
-                }
-            }
-        } else {
-            return false;
+    public static void validateVotingOption(VotingOptionRepository votingOptionRepository, String optionText, Voting voting) {
+        if (optionText.isEmpty()) {
+            throw new VotingException("Option text is empty.");
         }
-        return true;
+        VotingOption votingOption = votingOptionRepository.findByVotingAndOptionText(voting, optionText);
+        if (votingOption != null) {
+            throw new VotingException(String.format("Option \"%s\" is already exist!", optionText));
+        }
     }
 }

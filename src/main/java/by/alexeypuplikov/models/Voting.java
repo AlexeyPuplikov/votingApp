@@ -1,5 +1,7 @@
 package by.alexeypuplikov.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,9 +25,11 @@ public class Voting {
     @Column(name = "LINK")
     private String link;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "voting")
     private Set<VotingOption> votingOptions;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "voting")
     private Set<Vote> votes;
 
