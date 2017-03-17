@@ -2,6 +2,8 @@ package by.alexeypuplikov.utils;
 
 import by.alexeypuplikov.exception.VotingException;
 import by.alexeypuplikov.models.Voting;
+import by.alexeypuplikov.models.VotingOption;
+import by.alexeypuplikov.repositories.VotingOptionRepository;
 import by.alexeypuplikov.repositories.VotingRepository;
 
 public class ValidateVoting {
@@ -25,8 +27,30 @@ public class ValidateVoting {
         if (!changeState.equals(LAUNCH_STATE) && !changeState.equals(CLOSE_STATE)) {
             throw new VotingException(String.format("Parameter \"%s\" is incorrect!", changeState));
         }
-        if ((!voting.isLaunched() && changeState.equals(LAUNCH_STATE)) || (voting.isLaunched() && changeState.equals(CLOSE_STATE))) {
-            throw new VotingException("Voting is already have this state");
+        if ((voting.isLaunched() && changeState.equals(LAUNCH_STATE)) || (!voting.isLaunched() && changeState.equals(CLOSE_STATE))) {
+            throw new VotingException("Voting is already have this state.");
+        }
+    }
+
+    public static void validateVotingOption(VotingOptionRepository votingOptionRepository, String optionText, Voting voting) {
+        if (optionText.isEmpty()) {
+            throw new VotingException("Option text is empty.");
+        }
+        VotingOption votingOption = votingOptionRepository.findByVotingAndOptionText(voting, optionText);
+        if (votingOption != null) {
+            throw new VotingException(String.format("Option \"%s\" is already exist!", optionText));
+        }
+    }
+
+    public static void validateRegistrationVote(VotingOptionRepository votingOptionRepository, String optionText, Voting voting) {
+        if (!voting.isLaunched()) {
+            throw new VotingException("This voting is unavailable.");
+        }
+        if (optionText.isEmpty()) {
+            throw new VotingException("Make a choice!");
+        }
+        if (votingOptionRepository.findByVotingAndOptionText(voting, optionText) == null) {
+            throw new VotingException("This option is unavailable.");
         }
     }
 }
