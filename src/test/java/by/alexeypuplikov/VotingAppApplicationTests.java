@@ -1,6 +1,7 @@
 package by.alexeypuplikov;
 
 import by.alexeypuplikov.models.Voting;
+import by.alexeypuplikov.models.VotingOption;
 import by.alexeypuplikov.repositories.VotingRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -55,7 +56,7 @@ public class VotingAppApplicationTests {
     @Autowired
     void setConverters(HttpMessageConverter<?>[] converters) {
 
-        this.mappingJackson2HttpMessageConverter = Arrays.asList(converters).stream()
+        this.mappingJackson2HttpMessageConverter = Arrays.stream(converters)
                 .filter(hmc -> hmc instanceof MappingJackson2HttpMessageConverter)
                 .findAny()
                 .orElse(null);
@@ -66,7 +67,7 @@ public class VotingAppApplicationTests {
 
     @Before
     public void setUp() {
-        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).dispatchOptions(true).build();
+        this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
         this.votingRepository.deleteAll();
 
         this.votingList.add(votingRepository.save(new Voting("Sports", null)));
@@ -86,10 +87,27 @@ public class VotingAppApplicationTests {
 
     @Test
     public void addVotingTest() throws Exception {
-        String votingJson = json(new Voting("Laptop", null));
+        String votingJson = json(new Voting("Cars", null));
         mockMvc.perform(post("/voting")
                 .contentType(contentType)
                 .content(votingJson))
+                .andExpect(status().isCreated());
+        mockMvc.perform(post("/voting")
+                .contentType(contentType)
+                .content(votingJson))
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    public void addVotingOptionTest() throws Exception {
+        String votingOptionJson = json(new VotingOption("Hp", votingRepository.findByTopic("Laptop")));
+        mockMvc.perform(post("/voting/Laptop/addVotingOption")
+                .contentType(contentType)
+                .content(votingOptionJson))
+                .andExpect(status().isCreated());
+        mockMvc.perform(post("/voting/Laptop/addVotingOption")
+                .contentType(contentType)
+                .content(votingOptionJson))
                 .andExpect(status().is4xxClientError());
     }
 

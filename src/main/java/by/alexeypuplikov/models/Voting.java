@@ -114,4 +114,16 @@ public class Voting {
         result = 31 * result + (isLaunched ? 1 : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Voting{" +
+                "id=" + id +
+                ", topic='" + topic + '\'' +
+                ", link='" + link + '\'' +
+                ", votingOptions=" + votingOptions +
+                ", votes=" + votes +
+                ", isLaunched=" + isLaunched +
+                '}';
+    }
 }

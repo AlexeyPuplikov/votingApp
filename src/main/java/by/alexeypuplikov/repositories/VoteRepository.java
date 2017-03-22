@@ -7,6 +7,6 @@ import by.alexeypuplikov.models.VotingOption;
 import org.springframework.data.repository.CrudRepository;
 
 public interface VoteRepository extends CrudRepository<Vote, Long> {
-    Vote findByVotingAndAndUser(Voting voting, User user);
+    Vote findByVotingAndUser(Voting voting, User user);
     Long countByVotingAndVotingOption(Voting voting, VotingOption votingOption);
 }

@@ -28,6 +28,14 @@ public class VotingOption {
         return id;
     }
 
+    public VotingOption() {
+    }
+
+    public VotingOption(String optionText, Voting voting) {
+        this.optionText = optionText;
+        this.voting = voting;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }

@@ -59,7 +59,7 @@ public class VotingRestController {
         Voting voting = votingRepository.findByTopic(topic);
         ValidateVoting.validateLaunchVoting(voting, topic, changeState);
         if (changeState.equals("launch")) {
-            voting.setLink(String.valueOf(this.getURLValue(request)) + "/" + voting.getTopic());
+            voting.setLink(String.valueOf(this.getURLValue(request)) + "/" + voting.getTopic().replace(" ", "%20"));
             voting.setLaunched(true);
         }
         if (changeState.equals("close")) {
@@ -87,9 +87,10 @@ public class VotingRestController {
     @RequestMapping(method = RequestMethod.GET, value = "/{topic}/statistics")
     public ResponseEntity<?> findStatistics(@PathVariable String topic) {
         Map<String, Long> statistics = new HashMap<>();
-        List<VotingOption> votingOptions = votingOptionRepository.findByVoting(votingRepository.findByTopic(topic));
-        for(VotingOption votingOption : votingOptions) {
-            statistics.put(votingOption.getOptionText(), voteRepository.countByVotingAndVotingOption(votingRepository.findByTopic(topic), votingOption));
+        Voting voting = votingRepository.findByTopic(topic);
+        List<VotingOption> votingOptions = votingOptionRepository.findByVoting(voting);
+        for (VotingOption votingOption : votingOptions) {
+            statistics.put(votingOption.getOptionText(), voteRepository.countByVotingAndVotingOption(voting, votingOption));
         }
         return new ResponseEntity<>(statistics, HttpStatus.OK);
     }

@@ -53,7 +53,7 @@ public class ValidateVoting {
         if (votingOptionRepository.findByVotingAndOptionText(voting, optionText) == null) {
             throw new VotingException("This option is unavailable.");
         }
-        if (voteRepository.findByVotingAndAndUser(voting, userRepository.findByLogin(login)) != null) {
+        if (voteRepository.findByVotingAndUser(voting, userRepository.findByLogin(login)) != null) {
             throw new VotingException("You have already made your choice.");
         }
         if (login.isEmpty() || userRepository.findByLogin(login) == null) {
