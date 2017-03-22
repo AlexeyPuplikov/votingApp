@@ -2,13 +2,7 @@ package by.alexeypuplikov.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Set;
 
 @Entity
@@ -17,7 +11,7 @@ public class Voting {
     @Id
     @Column(name = "VOTING_ID")
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long Id;
+    private Long id;
 
     @Column(name = "TOPIC")
     private String topic;
@@ -25,12 +19,12 @@ public class Voting {
     @Column(name = "LINK")
     private String link;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "voting")
+    @JsonIgnore
     private Set<VotingOption> votingOptions;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "voting")
+    @JsonIgnore
     private Set<Vote> votes;
 
     @Column(name = "IS_LAUNCHED")
@@ -45,12 +39,12 @@ public class Voting {
         this.link = link;
     }
 
-    public long getId() {
-        return Id;
+    public Long getId() {
+        return id;
     }
 
-    public void setId(long id) {
-        Id = id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getTopic() {
@@ -63,10 +57,6 @@ public class Voting {
 
     public String getLink() {
         return link;
-    }
-
-    public boolean isLaunched() {
-        return isLaunched;
     }
 
     public void setLink(String link) {
@@ -89,6 +79,10 @@ public class Voting {
         this.votes = votes;
     }
 
+    public boolean isLaunched() {
+        return isLaunched;
+    }
+
     public void setLaunched(boolean launched) {
         isLaunched = launched;
     }
@@ -100,30 +94,24 @@ public class Voting {
 
         Voting voting = (Voting) o;
 
-        return Id == voting.Id && isLaunched == voting.isLaunched && topic.equals(voting.topic) && (link != null ? link.equals(voting.link) : voting.link == null && (votingOptions != null ? votingOptions.equals(voting.votingOptions) : voting.votingOptions == null && (votes != null ? votes.equals(voting.votes) : voting.votes == null)));
+        if (isLaunched != voting.isLaunched) return false;
+        if (!id.equals(voting.id)) return false;
+        if (!topic.equals(voting.topic)) return false;
+        if (link != null ? !link.equals(voting.link) : voting.link != null) return false;
+        if (votingOptions != null ? !votingOptions.equals(voting.votingOptions) : voting.votingOptions != null)
+            return false;
+        return votes != null ? votes.equals(voting.votes) : voting.votes == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (Id ^ (Id >>> 32));
+        int result = id.hashCode();
         result = 31 * result + topic.hashCode();
         result = 31 * result + (link != null ? link.hashCode() : 0);
         result = 31 * result + (votingOptions != null ? votingOptions.hashCode() : 0);
         result = 31 * result + (votes != null ? votes.hashCode() : 0);
         result = 31 * result + (isLaunched ? 1 : 0);
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return "Voting{" +
-                "Id=" + Id +
-                ", topic='" + topic + '\'' +
-                ", link='" + link + '\'' +
-                ", votingOptions=" + votingOptions +
-                ", votes=" + votes +
-                ", isLaunched=" + isLaunched +
-                '}';
     }
 }

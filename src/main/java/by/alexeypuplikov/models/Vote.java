@@ -2,13 +2,7 @@ package by.alexeypuplikov.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "vote")
@@ -16,29 +10,34 @@ public class Vote {
     @Id
     @Column(name = "VOTE_ID")
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
+    @ManyToOne()
     @JsonIgnore
-    @ManyToOne
     private VotingOption votingOption;
 
+    @ManyToOne()
     @JsonIgnore
-    @ManyToOne
     private Voting voting;
+
+    @ManyToOne()
+    @JsonIgnore
+    private User user;
 
     public Vote() {
     }
 
-    public Vote(VotingOption votingOption, Voting voting) {
+    public Vote(VotingOption votingOption, Voting voting, User user) {
         this.votingOption = votingOption;
         this.voting = voting;
+        this.user = user;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -58,6 +57,14 @@ public class Vote {
         this.voting = voting;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -65,15 +72,19 @@ public class Vote {
 
         Vote vote = (Vote) o;
 
-        return id == vote.id && votingOption.equals(vote.votingOption) && voting.equals(vote.voting);
+        if (!id.equals(vote.id)) return false;
+        if (!votingOption.equals(vote.votingOption)) return false;
+        if (!voting.equals(vote.voting)) return false;
+        return user.equals(vote.user);
 
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
+        int result = id.hashCode();
         result = 31 * result + votingOption.hashCode();
         result = 31 * result + voting.hashCode();
+        result = 31 * result + user.hashCode();
         return result;
     }
 
@@ -83,6 +94,7 @@ public class Vote {
                 "id=" + id +
                 ", votingOption=" + votingOption +
                 ", voting=" + voting +
+                ", user=" + user +
                 '}';
     }
 }

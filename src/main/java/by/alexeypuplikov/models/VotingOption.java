@@ -2,14 +2,7 @@ package by.alexeypuplikov.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Set;
 
 @Entity
@@ -18,30 +11,24 @@ public class VotingOption {
     @Id
     @Column(name = "VOTING_OPTION_ID")
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
     @Column(name = "OPTION_TEXT")
     private String optionText;
 
-    @JsonIgnore
     @ManyToOne()
+    @JsonIgnore
     private Voting voting;
 
     @OneToMany(mappedBy = "votingOption")
+    @JsonIgnore
     private Set<Vote> votes;
 
-    public VotingOption() {
-    }
-
-    public VotingOption(String optionText) {
-        this.optionText = optionText;
-    }
-
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -76,13 +63,16 @@ public class VotingOption {
 
         VotingOption that = (VotingOption) o;
 
-        return id == that.id && optionText.equals(that.optionText) && voting.equals(that.voting) && (votes != null ? votes.equals(that.votes) : that.votes == null);
+        if (!id.equals(that.id)) return false;
+        if (!optionText.equals(that.optionText)) return false;
+        if (!voting.equals(that.voting)) return false;
+        return votes != null ? votes.equals(that.votes) : that.votes == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
+        int result = id.hashCode();
         result = 31 * result + optionText.hashCode();
         result = 31 * result + voting.hashCode();
         result = 31 * result + (votes != null ? votes.hashCode() : 0);

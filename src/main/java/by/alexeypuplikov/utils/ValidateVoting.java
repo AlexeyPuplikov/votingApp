@@ -3,6 +3,8 @@ package by.alexeypuplikov.utils;
 import by.alexeypuplikov.exception.VotingException;
 import by.alexeypuplikov.models.Voting;
 import by.alexeypuplikov.models.VotingOption;
+import by.alexeypuplikov.repositories.UserRepository;
+import by.alexeypuplikov.repositories.VoteRepository;
 import by.alexeypuplikov.repositories.VotingOptionRepository;
 import by.alexeypuplikov.repositories.VotingRepository;
 
@@ -14,8 +16,7 @@ public class ValidateVoting {
         if (topic.isEmpty()) {
             throw new VotingException("Topic is empty.");
         }
-        Voting voting = votingRepository.findByTopic(topic);
-        if (voting != null) {
+        if (votingRepository.findByTopic(topic) != null) {
             throw new VotingException(String.format("Topic \"%s\" is already exist!", topic));
         }
     }
@@ -42,7 +43,7 @@ public class ValidateVoting {
         }
     }
 
-    public static void validateRegistrationVote(VotingOptionRepository votingOptionRepository, String optionText, Voting voting) {
+    public static void validateRegistrationVote(VotingOptionRepository votingOptionRepository, String optionText, Voting voting, String login, UserRepository userRepository, VoteRepository voteRepository) {
         if (!voting.isLaunched()) {
             throw new VotingException("This voting is unavailable.");
         }
@@ -51,6 +52,12 @@ public class ValidateVoting {
         }
         if (votingOptionRepository.findByVotingAndOptionText(voting, optionText) == null) {
             throw new VotingException("This option is unavailable.");
+        }
+        if (voteRepository.findByVotingAndAndUser(voting, userRepository.findByLogin(login)) != null) {
+            throw new VotingException("You have already made your choice.");
+        }
+        if (login.isEmpty() || userRepository.findByLogin(login) == null) {
+            throw new VotingException("Login to vote!");
         }
     }
 }

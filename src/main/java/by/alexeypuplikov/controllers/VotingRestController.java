@@ -3,6 +3,7 @@ package by.alexeypuplikov.controllers;
 import by.alexeypuplikov.models.Vote;
 import by.alexeypuplikov.models.Voting;
 import by.alexeypuplikov.models.VotingOption;
+import by.alexeypuplikov.repositories.UserRepository;
 import by.alexeypuplikov.repositories.VoteRepository;
 import by.alexeypuplikov.repositories.VotingOptionRepository;
 import by.alexeypuplikov.repositories.VotingRepository;
@@ -14,6 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/voting")
@@ -21,12 +25,14 @@ public class VotingRestController {
     private final VotingRepository votingRepository;
     private final VotingOptionRepository votingOptionRepository;
     private final VoteRepository voteRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public VotingRestController(VotingRepository votingRepository, VotingOptionRepository votingOptionRepository, VoteRepository voteRepository) {
+    public VotingRestController(VotingRepository votingRepository, VotingOptionRepository votingOptionRepository, VoteRepository voteRepository, UserRepository userRepository) {
         this.votingRepository = votingRepository;
         this.votingOptionRepository = votingOptionRepository;
         this.voteRepository = voteRepository;
+        this.userRepository = userRepository;
     }
 
     @RequestMapping(method = RequestMethod.GET)
@@ -63,20 +69,29 @@ public class VotingRestController {
         return new ResponseEntity<>(votingRepository.save(voting), HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/{topic}", params = "optionText")
-    public ResponseEntity<?> registrationVote(@PathVariable String topic, @RequestParam(value = "optionText") String optionText) {
+    @RequestMapping(method = RequestMethod.POST, value = "/{topic}", params = {"optionText", "login"})
+    public ResponseEntity<?> registrationVote(@PathVariable String topic, @RequestParam(value = "optionText") String optionText, @RequestParam(value = "login") String login) {
         Voting voting = votingRepository.findByTopic(topic);
-        ValidateVoting.validateRegistrationVote(votingOptionRepository, optionText, voting);
+        ValidateVoting.validateRegistrationVote(votingOptionRepository, optionText, voting, login, userRepository, voteRepository);
         VotingOption votingOption = votingOptionRepository.findByVotingAndOptionText(voting, optionText);
-        Vote vote = new Vote(votingOption, voting);
+        Vote vote = new Vote(votingOption, voting, userRepository.findByLogin(login));
         return new ResponseEntity<>(voteRepository.save(vote), HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/{topic}")
     public ResponseEntity<?> getVoting(@PathVariable String topic) {
-        //add validation for topic
         Voting voting = votingRepository.findByTopic(topic);
         return new ResponseEntity<>(voting, HttpStatus.OK);
+    }
+
+    @RequestMapping(method = RequestMethod.GET, value = "/{topic}/statistics")
+    public ResponseEntity<?> findStatistics(@PathVariable String topic) {
+        Map<String, Long> statistics = new HashMap<>();
+        List<VotingOption> votingOptions = votingOptionRepository.findByVoting(votingRepository.findByTopic(topic));
+        for(VotingOption votingOption : votingOptions) {
+            statistics.put(votingOption.getOptionText(), voteRepository.countByVotingAndVotingOption(votingRepository.findByTopic(topic), votingOption));
+        }
+        return new ResponseEntity<>(statistics, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/", produces = "application/json")
